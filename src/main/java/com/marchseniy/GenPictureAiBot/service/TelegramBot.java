@@ -1,6 +1,6 @@
 package com.marchseniy.GenPictureAiBot.service;
 
-import com.marchseniy.GenPictureAiBot.client.FusionBrainClient;
+import com.marchseniy.GenPictureAiBot.commands.support.MessageHandler;
 import com.marchseniy.GenPictureAiBot.config.BotConfig;
 import com.marchseniy.GenPictureAiBot.service.exceptions.CommandNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +10,7 @@ import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
@@ -17,20 +18,23 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMar
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 @Component
 public class TelegramBot extends TelegramLongPollingBot {
     private final BotConfig config;
     private final CommandManager commandManager;
-    private final FusionBrainClient fusionBrainClient;
+    private final List<MessageHandler> messageHandlers;
 
     @Autowired
-    public TelegramBot(BotConfig config, CommandManager commandManager, FusionBrainClient fusionBrainClient) {
+    public TelegramBot(BotConfig config, CommandManager commandManager,
+                       List<MessageHandler> messageHandlers) {
         this.config = config;
         this.commandManager = commandManager;
-        this.fusionBrainClient = fusionBrainClient;
+        this.messageHandlers = messageHandlers;
 
         setCommandsMenu();
     }
@@ -47,16 +51,6 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-//        fusionBrainClient.getImage("sunset over mountains", "realistic", 1024, 1024)
-//                .thenAccept(response -> {
-//                    sendPhoto(update.getMessage().getChatId(), response.getImageUrl());
-//                    System.out.println("Image generated: " + response.getImageUrl());
-//                })
-//                .exceptionally(ex -> {
-//                    System.err.println("Error generating image: " + ex.getMessage());
-//                    return null;
-//                });
-
         if (!(update.hasMessage() && update.getMessage().hasText())) {
             return;
         }
@@ -71,27 +65,30 @@ public class TelegramBot extends TelegramLongPollingBot {
             }
         }
         else {
-
+            messageHandlers.forEach(messageHandler -> messageHandler.onMessage(update, text));
         }
     }
 
-    public void sendMessage(long chatId, String textToSend, ReplyKeyboard replyKeyboard) {
+    public Message sendMessage(long chatId, String textToSend, ReplyKeyboard replyKeyboard) {
         SendMessage message = new SendMessage();
         message.setChatId(String.valueOf(chatId));
         message.setText(textToSend);
         message.setReplyMarkup(replyKeyboard);
 
         try {
-            execute(message);
+            return execute(message);
         } catch (TelegramApiException e) {
             e.printStackTrace();
+            return null;
         }
     }
 
     public void sendPhoto(Long chatId, String imageUrl) {
         SendPhoto sendPhoto = new SendPhoto();
         sendPhoto.setChatId(chatId);
-        sendPhoto.setPhoto(new InputFile(imageUrl));
+
+        InputFile photo = new InputFile(imageUrl);
+        sendPhoto.setPhoto(photo);
 
         try {
             execute(sendPhoto);
@@ -100,7 +97,26 @@ public class TelegramBot extends TelegramLongPollingBot {
         }
     }
 
-    public ReplyKeyboard getKeyboard(List<String> elements) {
+    public void sendPhotoByBase64(Long chatId, String base64Image, ReplyKeyboard replyKeyboard) {
+        try {
+            byte[] imageBytes = Base64.getDecoder().decode(base64Image);
+            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(imageBytes);
+
+            String fileName = "photo.png";
+
+            SendPhoto sendPhoto = new SendPhoto();
+            sendPhoto.setChatId(chatId);
+            sendPhoto.setPhoto(new InputFile(byteArrayInputStream, fileName));
+            sendPhoto.setReplyMarkup(replyKeyboard);
+
+            execute(sendPhoto);
+
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public ReplyKeyboardMarkup getKeyboard(List<String> elements) {
         ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
         List<KeyboardRow> keyboardRows = new ArrayList<>();
 
