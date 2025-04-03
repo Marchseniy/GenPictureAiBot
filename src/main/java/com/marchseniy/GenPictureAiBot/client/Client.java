@@ -10,7 +10,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 
-public abstract class Client<S extends ApiService> {
+public abstract class Client<S> {
     protected final S service;
 
     public Client() {
@@ -58,7 +58,7 @@ public abstract class Client<S extends ApiService> {
 
     private <T> void onErrorHandler(CompletableFuture<T> future, Response<T> response) {
         String errorMessage = "Error code: " + response.code();
-        String errorBody = null;
+        String errorBody;
 
         if (response.errorBody() != null) {
             try {

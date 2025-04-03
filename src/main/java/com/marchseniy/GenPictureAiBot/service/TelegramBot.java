@@ -1,9 +1,9 @@
 package com.marchseniy.GenPictureAiBot.service;
 
+import com.marchseniy.GenPictureAiBot.commands.Command;
 import com.marchseniy.GenPictureAiBot.commands.support.MessageHandler;
 import com.marchseniy.GenPictureAiBot.config.BotConfig;
 import com.marchseniy.GenPictureAiBot.service.exceptions.CommandNotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
@@ -29,7 +29,6 @@ public class TelegramBot extends TelegramLongPollingBot {
     private final CommandManager commandManager;
     private final List<MessageHandler> messageHandlers;
 
-    @Autowired
     public TelegramBot(BotConfig config, CommandManager commandManager,
                        List<MessageHandler> messageHandlers) {
         this.config = config;

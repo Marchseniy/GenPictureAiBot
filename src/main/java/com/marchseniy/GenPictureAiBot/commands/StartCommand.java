@@ -1,6 +1,5 @@
 package com.marchseniy.GenPictureAiBot.commands;
 
-import com.marchseniy.GenPictureAiBot.service.Command;
 import com.marchseniy.GenPictureAiBot.service.TelegramBot;
 import lombok.Getter;
 import org.springframework.context.annotation.Lazy;
@@ -8,7 +7,7 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 @Component
-public class StartCommand implements Command {
+public class StartCommand extends Command {
     @Getter
     private final String name = "start";
     @Getter

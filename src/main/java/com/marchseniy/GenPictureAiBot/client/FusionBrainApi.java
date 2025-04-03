@@ -8,7 +8,7 @@ import retrofit2.http.*;
 
 import java.util.List;
 
-public interface FusionBrainApi extends ApiService {
+public interface FusionBrainApi {
     @Multipart
     @POST("key/api/v1/text2image/run")
     Call<GenerateImageResponse> getImage(

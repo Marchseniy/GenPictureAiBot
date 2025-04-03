@@ -1,9 +1,9 @@
 package com.marchseniy.GenPictureAiBot.service;
 
+import com.marchseniy.GenPictureAiBot.commands.Command;
 import com.marchseniy.GenPictureAiBot.service.exceptions.CommandNotFoundException;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
@@ -16,7 +16,6 @@ public class CommandManager {
     public static final char COMMAND_PREFIX = '/';
     private final List<Command> commands;
 
-    @Autowired
     public CommandManager(List<Command> commands) {
         this.commands = commands;
     }

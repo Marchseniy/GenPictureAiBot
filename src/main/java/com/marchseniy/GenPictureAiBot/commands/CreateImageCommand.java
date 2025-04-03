@@ -4,7 +4,6 @@ import com.marchseniy.GenPictureAiBot.client.FusionBrainClient;
 import com.marchseniy.GenPictureAiBot.commands.support.MessageHandler;
 import com.marchseniy.GenPictureAiBot.commands.support.states.PromptState;
 import com.marchseniy.GenPictureAiBot.commands.support.states.UserState;
-import com.marchseniy.GenPictureAiBot.service.Command;
 import com.marchseniy.GenPictureAiBot.service.TelegramBot;
 import lombok.Getter;
 import org.springframework.context.annotation.Lazy;
@@ -14,7 +13,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import java.util.HashMap;
 
 @Component
-public class CreateImageCommand implements Command, MessageHandler {
+public class CreateImageCommand extends Command implements MessageHandler {
     @Getter
     private final String name = "createimage";
     @Getter
@@ -30,21 +29,6 @@ public class CreateImageCommand implements Command, MessageHandler {
     public CreateImageCommand(TelegramBot bot, FusionBrainClient fusionBrainClient) {
         this.bot = bot;
         this.fusionBrainClient = fusionBrainClient;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public String getDescription() {
-        return description;
-    }
-
-    @Override
-    public int getOrder() {
-        return order;
     }
 
     @Override
