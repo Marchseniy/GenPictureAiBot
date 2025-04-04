@@ -5,7 +5,6 @@ import com.marchseniy.GenPictureAiBot.commands.support.MessageHandler;
 import com.marchseniy.GenPictureAiBot.commands.support.states.PromptState;
 import com.marchseniy.GenPictureAiBot.commands.support.states.UserState;
 import com.marchseniy.GenPictureAiBot.service.TelegramBot;
-import lombok.Getter;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -14,19 +13,14 @@ import java.util.HashMap;
 
 @Component
 public class CreateImageCommand extends Command implements MessageHandler {
-    @Getter
-    private final String name = "createimage";
-    @Getter
-    private final String description = "Создает изображение";
-    @Getter
-    private final int order = 1;
-
     private final TelegramBot bot;
     private final FusionBrainClient fusionBrainClient;
     private final HashMap<Long, UserState> userCreateImageStates = new HashMap<>();
 
     @Lazy
     public CreateImageCommand(TelegramBot bot, FusionBrainClient fusionBrainClient) {
+        super("createimage", "Создает изображение", 1);
+
         this.bot = bot;
         this.fusionBrainClient = fusionBrainClient;
     }
